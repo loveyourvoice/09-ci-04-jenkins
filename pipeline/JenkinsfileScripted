@@ -1,0 +1,21 @@
+def base_command = 'ansible-playbook site.yml -i inventory/prod.yml'
+
+node("123"){
+    parameters {
+        string(name: 'prod_run', defaultValue: 'False', description: 'Run without --check --diff')
+    }
+    
+    stage("Git checkout"){
+        git credentialsId: '22bbb3e0-906f-4593-8ab2-daea54d2e174',
+        url: 'https://github.com/aragastmatb/example-playbook.git',
+        branch: 'master'
+    }
+    
+    stage("Run playbook") {
+        if (params.prod_run == 'True') {
+            sh(base_command)
+        } else {
+            sh("$base_command --check --diff")
+        }
+    }
+}
